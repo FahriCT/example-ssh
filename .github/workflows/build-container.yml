@@ -34,4 +34,4 @@ jobs:
           context: .
           file: ./Dockerfile
           tags: |
-            koyeb/ubuntu-ssh-server:latest
+            koyeb/ubuntu-ssh-server:22
