@@ -1,5 +1,16 @@
-FROM ubuntu:22.04
+FROM ubuntu:20.04
 
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN dpkg --add-architecture i386 && \
+    apt-get update && \
+    apt-get install -y \
+    libc6:i386 \
+    libstdc++6:i386 \
+    libncurses5:i386 \
+    zlib1g:i386 \
+    && rm -rf /var/lib/apt/lists/*
+    
 RUN apt-get update && apt-get install -y openssh-server sudo && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
