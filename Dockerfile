@@ -1,29 +1,30 @@
-FROM ubuntu:20.04
 
-ENV DEBIAN_FRONTEND=noninteractive
+FROM archlinux:multilib-devel-20260111.0.480139
 
-RUN dpkg --add-architecture i386 && \
-    apt-get update && \
-    apt-get install -y \
-    libc6:i386 \
-    libstdc++6:i386 \
-    libncurses5:i386 \
-    zlib1g:i386 \
-    && rm -rf /var/lib/apt/lists/*
-    
-RUN apt-get update && apt-get install -y openssh-server sudo && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# Update system and install necessary packages
+RUN pacman -Syu --noconfirm && \
+    pacman -S --noconfirm \
+    lib32-glibc \
+    lib32-gcc-libs \
+    lib32-ncurses \
+    lib32-zlib \
+    openssh \
+    sudo \
+    && pacman -Scc --noconfirm
 
+# Configure SSH
 RUN mkdir -p /root/.ssh \
     && touch /root/.ssh/authorized_keys \
     && chmod 700 /root/.ssh \
     && chmod 600 /root/.ssh/authorized_keys
 
+# Configure SSH to support legacy algorithms
 RUN echo "HostKeyAlgorithms +ssh-rsa" >>/etc/ssh/sshd_config \
     && echo "PubkeyAcceptedKeyTypes +ssh-rsa" >>/etc/ssh/sshd_config
 
-RUN service ssh start
+# Generate SSH host keys (required for Arch Linux)
+RUN ssh-keygen -A
+
 EXPOSE 22
 
 COPY ./docker-entrypoint.sh .
